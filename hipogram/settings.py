@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "hipogram.core",
     "hipogram.posts",
     "hipogram.users",
+
+    "taggit"
 ]
 
 MIDDLEWARE = [
@@ -135,8 +137,10 @@ MEDIA_URL = "/media/"
 LOGIN_URL = "users:login"
 LOGIN_REDIRECT_URL = "posts:list"
 LOGOUT_REDIRECT_URL = "posts:list"
+SHARE_REDIRECT_URL = "posts:share"
 
 
 # Crispy Forms
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+DEFAULT_AUTO_FIELD='django.db.models.AutoField' 

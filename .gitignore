@@ -3,6 +3,24 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#added later
+__pycache__
+*.pyc
+*~
+db.sqlite3
+/static/
+._*
+.DS_Store
+.fseventsd
+.Spotlight-V100
+Thumbs.db*
+ehthumbs*.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+.vscode/
+.history/
+*.code-workspace
+
 # C extensions
 *.so
 

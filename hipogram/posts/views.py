@@ -21,7 +21,7 @@ class ShareView(CreateView):
     model = Post
     fields = ['image', 'text', 'created_by', 'tags', 'creation_datetime']
     template_name = "share.html"
-    context_object_name = "posts"
+    form = PostForm(request.POST)
 """
 def post_new(request):
     if request.method == "POST":

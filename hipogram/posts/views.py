@@ -26,12 +26,11 @@ class ShareView(CreateView):
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)
-       # if form.is_valid():
-        post=form.save(commit=False)
-        post.author = request.user
-        post.published_date = timezone.now()
-        post.save()
-        return redirect("post_list")
+        if form.is_valid():
+            post=form.save(commit=False)
+            post.created_by = request.user
+            post.save()
+            return redirect("post_list")
     else:
         form = PostForm()
     return render(request, 'share.html', {'form': form})

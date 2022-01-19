@@ -3,9 +3,9 @@ from django.conf import settings
 from taggit.managers import TaggableManager
 
 class Post(models.Model):
-    image = models.ImageField()
+    image = models.ImageField(blank=True)
     text = models.TextField()
-    created_by = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    created_by = models.ForeignKey("auth.User", on_delete=models.CASCADE, null=True)
     creation_datetime = models.DateTimeField(auto_now_add=True)
     like_count = models.IntegerField(default=0)
     tags = TaggableManager()

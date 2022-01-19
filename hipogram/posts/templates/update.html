@@ -1,21 +1,16 @@
-{% extends "base.html" %}
-
 {% block content %}
 
-  <div class="container">
-    {% for post in posts %}
-    <aside>
-      <p>Trend Tags</p>
-    </aside>  
-      <div class="card mb-3">
+<div class="container">
+    <div class="card mb-3">
         <div class="card-body">
-          <a href="{% url "posts:delete_post" %}">Delete Post</a>
           <h2 class="card-title">{{ post.created_by.username }}</h2>
           <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
           <p class="card-text">{{ post.text }}</p>
+          <p class="card-text">{{ post.tags }}</p>
+          <small class="card-footer text-left">{{ post.like_count }}</small>
         </div>
         <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>
       </div>
-    {% endfor %}
-  </div>
+</div>
+
 {% endblock content %}

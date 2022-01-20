@@ -30,7 +30,7 @@ def post_new(request):
             post=form.save(commit=False)
             post.created_by = request.user
             post.save()
-            return redirect("list")
+            return redirect("post_list")
     else:
         form = PostForm()
     return render(request, 'share.html', {'form': form})

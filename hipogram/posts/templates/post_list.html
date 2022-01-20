@@ -9,6 +9,7 @@
     </aside>  
       <div class="card mb-3">
         <div class="card-body">
+          <a href="{% url "posts:update_post" %}">Update Post</a></br>
           <a href="{% url "posts:delete_post" %}">Delete Post</a>
           <h2 class="card-title">{{ post.created_by.username }}</h2>
           <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>

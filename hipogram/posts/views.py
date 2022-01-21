@@ -1,13 +1,15 @@
 from django.views.generic import ListView
 from django.views.generic import CreateView, UpdateView
-
-from .models import Post
-
-from taggit.models import Tag
-from .forms import PostForm
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+#from taggit.models import Tag
+
+from .models import Post
+from .forms import PostForm
+
 
 class PostListView(ListView):
     model = Post
@@ -23,6 +25,7 @@ class ShareView(CreateView):
     form = 'PostForm'
 """
 #to create a new post
+@login_required(login_url='users/login/')
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)
@@ -69,6 +72,7 @@ def update_post(request, id):
     context["form"] = form
 
     return render(request, "update.html", context)
+
 """
 #option 2 to update a post
 class update_post(UpdateView):

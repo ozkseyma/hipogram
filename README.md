@@ -21,6 +21,10 @@ Hipo Backend Team Interview Exercise
 
     `$ pip install -r requirements.txt`
 
+5. Migrate the database:
+
+    `$ python manage.py migrate`
+
 ## Usage
 
 1. To start server, run this command in the project directory:

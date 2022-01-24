@@ -23,7 +23,7 @@ Hipo Backend Team Interview Exercise
 
 5. Migrate the database:
 
-    `$ python manage.py migrate db.sqlite3`
+    `$ python manage.py migrate`
 
 ## Usage
 

@@ -25,7 +25,7 @@ class ShareView(CreateView):
     form = 'PostForm'
 """
 #to create a new post
-@login_required(login_url='users/login/')
+@login_required()
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)

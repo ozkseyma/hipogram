@@ -28,12 +28,12 @@ class ShareView(CreateView):
 @login_required()
 def post_new(request):
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post=form.save(commit=False)
             post.created_by = request.user
             post.save()
-            return redirect("post_list")
+            return redirect("list")
     else:
         form = PostForm()
     return render(request, 'share.html', {'form': form})

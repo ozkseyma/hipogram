@@ -16,7 +16,7 @@ class PostListView(ListView):
     ordering = "-creation_datetime"
     context_object_name = "posts"
     template_name = "post_list.html"
-    paginate_by = 5
+    paginate_by = 2
 
 """
 class ShareView(CreateView):

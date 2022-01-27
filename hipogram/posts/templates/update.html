@@ -8,7 +8,7 @@
       {% csrf_token %}
       {{ form|crispy }}
       <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
-      <button type="submit" style="background-color: red;" class="save btn btn-secondary"><a href="{% url "posts:delete_post" user.id %}">Delete</a></button>
+      <button type="submit" style="background-color: red;" class="save btn btn-secondary"><a href="{% url "posts:delete_post" post.id %}">Delete</a></button>
       <button type="submit" style="background-color: gray;" class="save btn btn-secondary">Cancel</button>
   </form>
 </div>

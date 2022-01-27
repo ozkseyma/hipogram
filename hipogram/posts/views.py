@@ -19,13 +19,6 @@ class PostListView(ListView):
     template_name = "post_list.html"
     paginate_by = 2
 
-def post_filter_list_view(request):
-    breakpoint()
-    post = get_object_or_404(Post)
-
-    if request.method == 'POST':
-        ...
-
 """
 class ShareView(CreateView):
     model = Post
@@ -54,6 +47,7 @@ def delete_post(request, id):
         form = PostForm(request.POST, instance=post)
         post.delete()
         messages.success(request, 'You have successfully deleted the post')
+        return redirect("posts:list")
     else:
         form = PostForm(instance=post)
 

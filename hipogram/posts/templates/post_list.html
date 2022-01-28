@@ -13,7 +13,8 @@
           <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
           <p class="card-text">{{ post.text }}</p>
           {% if post.created_by == user %}
-          <button><a href="{% url "posts:update_post" post.id %}">Update / Delete</a></button></br>
+          <button><a href="{% url "posts:update_post" post.id %}">Update</a></button>
+          <button><a href="{% url "posts:delete_post" post.id %}">Delete</a></button></br>
           {% endif %}
         </div>
         <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>

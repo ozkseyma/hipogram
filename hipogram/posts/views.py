@@ -9,7 +9,7 @@ from django.contrib import messages
 #from taggit.models import Tag
 
 from .models import Post
-from .forms import PostForm
+from .forms import PostForm, PostForm2
 
 
 class PostListView(ListView):
@@ -43,28 +43,34 @@ def post_new(request):
 @login_required()
 def delete_post(request, id):
     post = get_object_or_404(Post, id=id)
-    if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
-        post.delete()
-        messages.success(request, 'You have successfully deleted the post')
-        return redirect("posts:list")
-    else:
-        form = PostForm(instance=post)
 
-    return render(request, "update.html", {'form':form})
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = PostForm(request.POST, instance=post)
+            post.delete()
+            messages.success(request, 'You have successfully deleted the post')
+            return redirect("posts:list")
+        else:
+            form = PostForm(instance=post)
+
+        return render(request, "delete.html", {'form':form})
+    else:
+        return redirect("user:login")
 
 @login_required()
 def update_post(request, id):
     post = get_object_or_404(Post, id=id)
-    form = PostForm(request.POST, instance=post)
+    form = PostForm2(request.POST, instance=post)
 
     #save the data from the form
-    if form.is_valid():
-        form.save()
-        return redirect("posts:list")
+    if request.user.is_authenticated:
+        if form.is_valid():
+            form.save()
+            return redirect("posts:list")
 
-    return render(request, "update.html", {'form':form})
-
+        return render(request, "update.html", {'form':form})
+    else:
+        return redirect("user:login")     
 """
 #option 2 to update a post
 class update_post(UpdateView):

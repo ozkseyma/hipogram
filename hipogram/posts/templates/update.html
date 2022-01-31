@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
+
 {% block content %}
 
 <div class="container">
-  {% if post.id == id %}
-    <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image }}"/>
-  {% endif %}
   <form method="POST" novalidate>
       {% csrf_token %}
-      {{ form|crispy }}
+      <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
+      <p>Text*</p>
+      {{ form.text }}
+      </br>
       <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
   </form></br>
       <button type="submit" style="background-color: gray;" class="save btn btn-secondary"><a href="{% url "posts:list" %}">Cancel</a></button>

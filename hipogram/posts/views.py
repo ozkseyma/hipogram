@@ -9,7 +9,7 @@ from django.contrib import messages
 #from taggit.models import Tag
 
 from .models import Post
-from .forms import PostForm, PostForm2
+from .forms import PostForm
 
 
 class PostListView(ListView):
@@ -44,7 +44,7 @@ def post_new(request):
 def delete_post(request, id):
     post = get_object_or_404(Post, id=id)
 
-    if request.user.is_authenticated:
+    if request.user == post.created_by:
         if request.method == 'POST':
             form = PostForm(request.POST, instance=post)
             post.delete()
@@ -60,15 +60,15 @@ def delete_post(request, id):
 @login_required()
 def update_post(request, id):
     post = get_object_or_404(Post, id=id)
-    form = PostForm2(request.POST, instance=post)
+    form = PostForm(request.POST, instance=post)
 
     #save the data from the form
-    if request.user.is_authenticated:
+    if request.user == post.created_by:
         if form.is_valid():
             form.save()
             return redirect("posts:list")
 
-        return render(request, "update.html", {'form':form})
+        return render(request, "update.html", {'form':form, 'post':post})
     else:
         return redirect("user:login")     
 """

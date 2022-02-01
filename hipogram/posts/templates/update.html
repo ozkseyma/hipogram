@@ -1,20 +1,21 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
-
 {% block content %}
 
 <div class="container">
   <form method="POST" novalidate>
       {% csrf_token %}
+    <center>
       <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
-      <p>Text*</p>
-      {{ form.text }}
-      </br>
+    </center><br>
+        {{ form.text|as_crispy_field }}
       <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
-  </form></br>
-      <button type="submit" style="background-color: gray;" class="save btn btn-secondary"><a href="{% url "posts:list" %}">Cancel</a></button>
-      </br>
+  </form><br>
+      <a href="{% url "posts:list" %}">
+      <button type="submit" style="background-color: gray;" class="save btn btn-secondary">Cancel</button>
+      </a>
+    </br>
 </div>
 
 {% endblock content %}

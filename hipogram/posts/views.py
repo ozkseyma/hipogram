@@ -40,7 +40,6 @@ def post_new(request):
         form = PostForm()
     return render(request, 'share.html', {'form': form})
     
-@login_required()
 def delete_post(request, id):
     post = get_object_or_404(Post, id=id)
 
@@ -55,22 +54,26 @@ def delete_post(request, id):
 
         return render(request, "delete.html", {'form':form})
     else:
-        return redirect("user:login")
+        messages.error(request, 'You are not the owner of this post, please log in.')
+        return redirect("users:login")
 
-@login_required()
 def update_post(request, id):
     post = get_object_or_404(Post, id=id)
-    form = PostForm(request.POST, instance=post)
 
-    #save the data from the form
     if request.user == post.created_by:
-        if form.is_valid():
-            form.save()
-            return redirect("posts:list")
+        if request.method == 'POST':
+            form = PostForm(request.POST, instance=post)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'You have successfully updated the post')
+                return redirect("posts:list")
+        else:
+            form = PostForm(instance=post)
 
         return render(request, "update.html", {'form':form, 'post':post})
     else:
-        return redirect("user:login")     
+        messages.error(request, 'You are not the owner of this post, please log in.')  
+        return redirect("users:login")   
 """
 #option 2 to update a post
 class update_post(UpdateView):

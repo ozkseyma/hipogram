@@ -8,8 +8,6 @@ from django.contrib import messages
 
 from .models import Post
 from .forms import PostForm
-
-
 class PostListView(ListView):
     model = Post
     ordering = "-creation_datetime"

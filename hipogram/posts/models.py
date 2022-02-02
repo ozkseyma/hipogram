@@ -9,3 +9,4 @@ class Post(models.Model):
     creation_datetime = models.DateTimeField(auto_now_add=True)
     #like_count = models.IntegerField(default=0)
     #tags = TaggableManager()
+    

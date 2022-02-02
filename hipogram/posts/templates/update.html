@@ -1,14 +1,21 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
 {% block content %}
 
 <div class="container">
-    <div class="card mb-3">
-        <div class="card-body">
-          <h2 class="card-title">{{ post.created_by.username }}</h2>
-          <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
-          <p class="card-text">{{ post.text }}</p>
-        </div>
-        <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>
-      </div>
+  <form method="POST" novalidate>
+      {% csrf_token %}
+    <center>
+      <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
+    </center><br>
+        {{ form.text|as_crispy_field }}
+      <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
+  </form><br>
+      <a href="{% url "posts:list" %}">
+      <button type="submit" style="background-color: gray;" class="save btn btn-secondary">Cancel</button>
+      </a>
+    </br>
 </div>
 
 {% endblock content %}

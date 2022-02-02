@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 #from taggit.models import Tag
 
@@ -25,7 +26,7 @@ class ShareView(CreateView):
     template_name = "share.html"
     form = 'PostForm'
 """
-#to create a new post
+
 @login_required()
 def post_new(request):
     if request.method == "POST":
@@ -39,41 +40,40 @@ def post_new(request):
         form = PostForm()
     return render(request, 'share.html', {'form': form})
     
-#to delete a post
-def delete_post(request, pk):
-    template_name = 'update.html'
-    post = get_object_or_404(Post, pk=pk)
+def delete_post(request, id):
+    post = get_object_or_404(Post, id=id)
 
-    try:
+    if request.user == post.created_by:
         if request.method == 'POST':
             form = PostForm(request.POST, instance=post)
             post.delete()
             messages.success(request, 'You have successfully deleted the post')
+            return redirect("posts:list")
         else:
             form = PostForm(instance=post)
-    except Exception as e:
-        messages.warning(request, 'The post could not be deleted: Error {}'.format(e))
 
-    context = {'form':form,}
+        return render(request, "delete.html", {'form':form})
+    else:
+        messages.error(request, 'You are not the owner of this post, please log in.')
+        return redirect("users:login")
 
-    return render(request, template_name, context)
-
-#to update a post
 def update_post(request, id):
-    context = {}
     post = get_object_or_404(Post, id=id)
-    form = PostForm(request.POST, instance=post)
 
-    #save the data from the form
-    if form.is_valid():
-        form.save()
-        return redirect("list")
+    if request.user == post.created_by:
+        if request.method == 'POST':
+            form = PostForm(request.POST, instance=post)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'You have successfully updated the post')
+                return redirect("posts:list")
+        else:
+            form = PostForm(instance=post)
 
-    # add form dictionary to context
-    context["form"] = form
-
-    return render(request, "update.html", context)
-
+        return render(request, "update.html", {'form':form, 'post':post})
+    else:
+        messages.error(request, 'You are not the owner of this post, please log in.')  
+        return redirect("users:login")   
 """
 #option 2 to update a post
 class update_post(UpdateView):

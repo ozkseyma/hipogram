@@ -17,6 +17,12 @@ class PostListView(ListView):
     template_name = "post_list.html"
     paginate_by = 2
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if username := self.request.GET.get('username'):
+            queryset = queryset.filter(created_by__username=username)
+        return queryset
+
 
 """
 class ShareView(CreateView):

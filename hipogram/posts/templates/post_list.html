@@ -9,7 +9,8 @@
     </aside>  
       <div class="card mb-3">
         <div class="card-body">
-          <h2 class="card-title">{{ post.created_by.username }}</h2>
+          <a href="{% url "posts:list" %}?username={{post.created_by.username}}">
+          <h2 class="card-title">{{ post.created_by.username }}</h2></a>
           <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
           <p class="card-text">{{ post.text }}</p>
           {% if post.created_by == user %}

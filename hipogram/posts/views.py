@@ -18,10 +18,9 @@ class PostListView(ListView):
     paginate_by = 2
 
     def get_queryset(self):
-        queryset = Post.objects.all()
-        name = self.request.GET.get('name')
-        if name:
-            queryset.filter(created_by=name)
+        queryset = super().get_queryset()
+        if username := self.request.GET.get('username'):
+            queryset = queryset.filter(created_by__username=username)
         return queryset
 
 

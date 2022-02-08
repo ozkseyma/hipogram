@@ -10,6 +10,7 @@
       <img class="img-fluid mb-3" style="max-height:400px" src="{{ post.image.url }}"/>
     </center><br>
         {{ form.text|as_crispy_field }}
+        {{ form.tags|as_crispy_field }}
       <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
   </form><br>
       <a href="{% url "posts:list" %}">

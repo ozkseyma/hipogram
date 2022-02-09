@@ -9,7 +9,7 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ("created_by", "tags")
 
     def _tags(self, post):
-        return [tag for tag in post.tags.all()]
+        return list(post.tags.all())
 
 
 admin.site.register(Post, PostAdmin)

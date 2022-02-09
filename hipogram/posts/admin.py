@@ -1,5 +1,15 @@
 from django.contrib import admin
+from .models import Post, Tag
 
-from .models import Post
+admin.site.register(Tag)
 
-admin.site.register(Post)
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ("created_by", "creation_datetime", "_tags")
+    list_filter = ("created_by", "tags")
+
+    def _tags(self, post):
+        return list(post.tags.all())
+
+
+admin.site.register(Post, PostAdmin)

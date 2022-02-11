@@ -24,6 +24,9 @@ class PostListView(ListView):
         queryset = super().get_queryset()
         if username := self.request.GET.get('username'):
             queryset = queryset.filter(created_by__username=username)
+        if tag := self.request.GET.get('tag'):
+            queryset = queryset.filter(tags__name=tag)
+
         return queryset
 
     def get_context_data(self):

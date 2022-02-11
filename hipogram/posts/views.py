@@ -5,8 +5,11 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Count
+from django.utils import timezone
 
-from .models import Post
+
+from .models import Post, Tag
 from .forms import PostForm
 
 
@@ -21,7 +24,20 @@ class PostListView(ListView):
         queryset = super().get_queryset()
         if username := self.request.GET.get('username'):
             queryset = queryset.filter(created_by__username=username)
+        if tag := self.request.GET.get('tag'):
+            queryset = queryset.filter(tags__name=tag)
+
         return queryset
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        today = timezone.now().date()
+
+        context['tags'] = Tag.objects.filter(
+            post__creation_datetime__date=today
+        ).annotate(Count('post')).order_by('-post__count')
+
+        return context
 
 
 """
@@ -38,9 +54,8 @@ def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.created_by = request.user
-            post.save()
+            form.instance.created_by = request.user
+            form.save()
             return redirect("posts:list")
     else:
         form = PostForm()

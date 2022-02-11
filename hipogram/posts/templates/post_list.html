@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-
   <div class="container">
-    {% for post in posts %}
     <aside>
       <p>Trend Tags</p>
-    </aside>  
+      {% for tag in tags %}
+        #{{ tag }} ({{ tag.post__count }})<br>
+      {% endfor %}
+    </aside>
+    {% for post in posts %}  
       <div class="card mb-3">
         <div class="card-body">
           <a href="{% url "posts:list" %}?username={{post.created_by.username}}">

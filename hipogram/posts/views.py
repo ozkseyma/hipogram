@@ -5,8 +5,10 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Count
+from django.utils.timezone import datetime
 
-from .models import Post
+from .models import Post, Tag
 from .forms import PostForm
 
 
@@ -22,6 +24,12 @@ class PostListView(ListView):
         if username := self.request.GET.get('username'):
             queryset = queryset.filter(created_by__username=username)
         return queryset
+
+    def get_context_data(self):
+        context = super(PostListView, self).get_context_data()
+        today = datetime.now().date()
+        context['tags'] = Tag.objects.filter(post__creation_datetime__date=today).annotate(Count('post')).order_by('-post__count')
+        return context
 
 
 """

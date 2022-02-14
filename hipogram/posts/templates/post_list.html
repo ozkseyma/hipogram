@@ -24,6 +24,8 @@
           <a style="color: white;" href="{% url "posts:update_post" post.id %}"><button class="btn btn-primary">Update</button></a>
           <a style="color: white;" href="{% url "posts:delete_post" post.id %}"><button class="btn btn-primary">Delete</button></a></br>
           {% endif %}
+          <br>
+          <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary">Like</button></a><br>
         </div>
         <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>
       </div>

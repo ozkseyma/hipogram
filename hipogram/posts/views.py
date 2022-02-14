@@ -1,15 +1,13 @@
 from django.views.generic import ListView
 # from django.views.generic import CreateView, UpdateView
-from django.shortcuts import redirect
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
 
 
-from .models import Post, Tag
+from .models import Post, Tag, Like
 from .forms import PostForm
 
 
@@ -97,6 +95,12 @@ def update_post(request, id):
     else:
         messages.error(request, 'You are not the owner of this post, please log in.')
         return redirect("users:login")
+
+
+def like_post(request, id):
+    new_like, created = Like.objects.get_or_create(user=request.user, post_id=id)
+
+    # if not created:
 
 
 """

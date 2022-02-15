@@ -1,10 +1,10 @@
 from django.views.generic import ListView
-# from django.views.generic import CreateView, UpdateView
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 
 
 from .models import Post, Tag, Like
@@ -98,11 +98,12 @@ def update_post(request, post_id):
 
 
 def like_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
     new_like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
 
-    # if not created:
-    return render(request, "posts:list", {'post': post})
+    if not created:
+        new_like.delete()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 """

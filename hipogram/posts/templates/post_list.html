@@ -25,7 +25,11 @@
           <a style="color: white;" href="{% url "posts:delete_post" post.id %}"><button class="btn btn-primary">Delete</button></a></br>
           {% endif %}
           <br>
-          <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary">Like ({{ post.like_count }})</button></a><br>
+          {% if not created %}
+            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary" style="background-color:green">Like ({{ post.like_count }})</button></a><br>
+          {% else %}
+            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary">Like ({{ post.like_count }})</button></a><br>
+          {% endif %}
         </div>
         <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>
       </div>

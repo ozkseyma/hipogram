@@ -98,9 +98,11 @@ def update_post(request, id):
 
 
 def like_post(request, id):
+    post = get_object_or_404(Post, id=id)
     new_like, created = Like.objects.get_or_create(user=request.user, post_id=id)
 
     # if not created:
+    return render(request, "posts:list", {'post': post})
 
 
 """

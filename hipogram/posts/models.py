@@ -18,6 +18,7 @@ class Post(models.Model):
     def __str__(self):
         return self.created_by.username
 
+    @property
     def like_count(self):
         Like.objects.filter(post=self).count()
 

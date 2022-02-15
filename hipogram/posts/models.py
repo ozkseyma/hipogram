@@ -20,10 +20,9 @@ class Post(models.Model):
 
     @property
     def like_count(self):
-        Like.objects.filter(post=self).count()
+        return self.likes.count()
 
 
 class Like(models.Model):
-    post = models.ForeignKey("Post", on_delete=models.CASCADE)
-    user = models.ForeignKey("auth.user", on_delete=models.CASCADE)
-    like_datetime = models.DateTimeField(auto_now_add=True)
+    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)

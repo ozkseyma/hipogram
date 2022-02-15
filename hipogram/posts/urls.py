@@ -8,7 +8,7 @@ app_name = "posts"
 urlpatterns = [
     path("", PostListView.as_view(), name="list"),
     path('share/', views.post_new, name='post_new'),
-    path('update/<int:id>/', views.update_post, name='update_post'),
-    path('delete/<int:id>/', views.delete_post, name='delete_post'),
-    path('like/<int:id>/', views.like_post, name='like_post'),
+    path('update/<int:post_id>/', views.update_post, name='update_post'),
+    path('delete/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('like/<int:post_id>/', views.like_post, name='like_post'),
 ]

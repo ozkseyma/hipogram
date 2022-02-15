@@ -60,8 +60,8 @@ def post_new(request):
     return render(request, 'share.html', {'form': form})
 
 
-def delete_post(request, id):
-    post = get_object_or_404(Post, id=id)
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
     if request.user == post.created_by:
         if request.method == 'POST':
@@ -78,8 +78,8 @@ def delete_post(request, id):
         return redirect("users:login")
 
 
-def update_post(request, id):
-    post = get_object_or_404(Post, id=id)
+def update_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
     if request.user == post.created_by:
         if request.method == 'POST':
@@ -97,9 +97,9 @@ def update_post(request, id):
         return redirect("users:login")
 
 
-def like_post(request, id):
-    post = get_object_or_404(Post, id=id)
-    new_like, created = Like.objects.get_or_create(user=request.user, post_id=id)
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    new_like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
 
     # if not created:
     return render(request, "posts:list", {'post': post})

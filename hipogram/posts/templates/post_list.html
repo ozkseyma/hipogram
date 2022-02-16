@@ -26,10 +26,15 @@
           {% endif %}
           <br>
           {% if not created %}
-            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary" style="background-color:green">Like ({{ post.like_count }})</button></a><br>
+            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary" style="background-color:green">Like ({{ post.like_count }})</button></a>
           {% else %}
-            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary">Like ({{ post.like_count }})</button></a><br>
+            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary">Like ({{ post.like_count }})</button></a>
           {% endif %}
+          <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {{ post.get_tags_display }}
+            <button type="submit" class="save btn btn-secondary">Rate</button>
+          </form>
         </div>
         <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>
       </div>

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Avg
 
 
 class Tag(models.Model):
@@ -22,7 +23,18 @@ class Post(models.Model):
     def like_count(self):
         return self.likes.count()
 
+    @property
+    def average_rate(self):
+        return self.rates.aggregate(Avg('rates'))
+
 
 class Like(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+
+
+class Rate(models.Model):
+    RATE_CHOICES = [(0, '0'), (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
+    rate = models.CharField(max_length=1, choices=RATE_CHOICES)
+    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="rates")
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE)

@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 
 
-from .models import Post, Tag, Like
+from .models import Post, Tag, Like, Rate
 from .forms import PostForm
 
 
@@ -104,6 +104,17 @@ def like_post(request, post_id):
         new_like.delete()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def rate_post(request, post_id):
+
+    if request.method == 'POST':
+        new_rate, created = Rate.objects.get_or_create(user=request.user, post_id=post_id)
+
+        if not created:
+            new_rate.update()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 """

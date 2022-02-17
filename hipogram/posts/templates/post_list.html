@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_tags %}
 
 {% block content %}
   <div class="container">
@@ -20,22 +22,18 @@
             <a href="{% url "posts:list" %}?tag={{tag}}">#{{ tag }}</a>
           {% endfor %}
           <br><br>
-          {% if post.created_by == user %}
-          <a style="color: white;" href="{% url "posts:update_post" post.id %}"><button class="btn btn-primary">Update</button></a>
-          <a style="color: white;" href="{% url "posts:delete_post" post.id %}"><button class="btn btn-primary">Delete</button></a></br>
-          {% endif %}
-          <br>
-          {% if not created %}
-            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary" style="background-color:green">Like ({{ post.like_count }})</button></a>
-          {% else %}
-            <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary">Like ({{ post.like_count }})</button></a>
-          {% endif %}
-          <form method="POST" enctype="multipart/form-data" novalidate>
+          {% is_liked post user as is_liked %}
+          <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary" {% if is_liked %} style="background-color:green"{% endif %}>Like ({{ post.like_count }})</button></a>
+          <form method="POST" action="{% url "posts:rate_post" post.id %}" novalidate><br>
             {% csrf_token %}
-            {{ post.get_tags_display }}
-            <button type="submit" class="save btn btn-secondary">Rate</button>
+            {{ form.rate }} 
+          <button type="submit" class="btn btn-primary">Rate ({{ post.average_rate|floatformat:2 }})</button>
           </form>
-        </div>
+          {% if post.created_by == user %}
+          <a style="color: white;" href="{% url "posts:update_post" post.id %}"><button class="btn btn-primary float-right">Update</button></a>
+          <a style="color: white;" href="{% url "posts:delete_post" post.id %}"><button class="btn btn-primary float-right">Delete</button></a></br>
+          {% endif %}
+          </div>
         <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>
       </div>
     {% endfor %}

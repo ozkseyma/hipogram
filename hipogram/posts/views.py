@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 
 
 from .models import Post, Tag, Like, Rate
-from .forms import PostForm
+from .forms import PostForm, RatePostForm
 
 
 class PostListView(ListView):
@@ -34,7 +34,7 @@ class PostListView(ListView):
         context['tags'] = Tag.objects.filter(
             post__creation_datetime__date=today
         ).annotate(Count('post')).order_by('-post__count')
-
+        context['form'] = RatePostForm()
         return context
 
 
@@ -98,10 +98,10 @@ def update_post(request, post_id):
 
 
 def like_post(request, post_id):
-    new_like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
+    like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
 
     if not created:
-        new_like.delete()
+        like.delete()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -109,12 +109,16 @@ def like_post(request, post_id):
 def rate_post(request, post_id):
 
     if request.method == 'POST':
-        new_rate, created = Rate.objects.get_or_create(user=request.user, post_id=post_id)
+        form = RatePostForm(request.POST)
+        if form.is_valid():
+            rate = form.save(commit=False)
+
+        new_rate, created = Rate.objects.get_or_create(user=request.user, post_id=post_id, rate=form.data['rate'])
 
         if not created:
-            new_rate.update()
+            new_rate.update(new_rate=rate)
 
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 """

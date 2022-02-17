@@ -25,7 +25,7 @@ class Post(models.Model):
 
     @property
     def average_rate(self):
-        return self.rates.aggregate(Avg('rates'))
+        return self.rates.aggregate(Avg('rate'))['rate__avg']
 
 
 class Like(models.Model):
@@ -34,7 +34,6 @@ class Like(models.Model):
 
 
 class Rate(models.Model):
-    RATE_CHOICES = [(0, '0'), (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
-    rate = models.CharField(max_length=1, choices=RATE_CHOICES)
+    rate = models.PositiveSmallIntegerField(choices=[(i, i) for i in [0, 1, 2, 3, 4, 5]], default=0)
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="rates")
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE)

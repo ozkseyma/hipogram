@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Avg
+from django.core.exceptions import ValidationError
 
 
 class Tag(models.Model):
@@ -25,7 +26,7 @@ class Post(models.Model):
 
     @property
     def average_rate(self):
-        return self.rates.aggregate(Avg('rate'))['rate__avg']
+        return self.rates.aggregate(Avg('value'))['value__avg']
 
 
 class Like(models.Model):
@@ -34,6 +35,14 @@ class Like(models.Model):
 
 
 class Rate(models.Model):
-    rate = models.PositiveSmallIntegerField(choices=[(i, i) for i in [0, 1, 2, 3, 4, 5]], default=0)
+    value = models.PositiveSmallIntegerField(choices=[(i, i) for i in [0, 1, 2, 3, 4, 5]], default=0)
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="rates")
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if not Rate.objects.filter(post=self.post).exists():
+            raise ValidationError("A rate already exists!")

@@ -14,4 +14,4 @@ class RatePostForm(forms.ModelForm):
 
     class Meta:
         model = Rate
-        fields = ['rate']
+        fields = ['value']

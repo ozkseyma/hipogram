@@ -110,13 +110,13 @@ def rate_post(request, post_id):
 
     if request.method == 'POST':
         form = RatePostForm(request.POST)
-        if form.is_valid():
-            rate = form.save(commit=False)
 
-        new_rate, created = Rate.objects.get_or_create(user=request.user, post_id=post_id, rate=form.data['rate'])
+    # if not form.is_valid():
+        # do something
 
-        if not created:
-            new_rate.update(new_rate=rate)
+        rate, created = Rate.objects.get_or_create(user=request.user, post_id=post_id)
+        rate.value = form.data['value']
+        rate.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 

@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import Avg
-from django.core.exceptions import ValidationError
 
 
 class Tag(models.Model):
@@ -39,10 +38,7 @@ class Rate(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="rates")
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
-
-    def clean(self):
-        if not Rate.objects.filter(post=self.post).exists():
-            raise ValidationError("A rate already exists!")
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['post', 'user'], name='unique_rate')
+                      ]

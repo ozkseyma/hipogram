@@ -116,7 +116,7 @@ def rate_post(request, post_id):
     # if not form.is_valid():
         # do something
 
-        rate, created = Rate.objects.get_or_create(user=request.user, post_id=post_id)
+        rate, _ = Rate.objects.get_or_create(user=request.user, post_id=post_id)
         rate.value = form.data['value']
         rate.save()
 

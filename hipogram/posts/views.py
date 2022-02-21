@@ -1,16 +1,14 @@
 from django.views.generic import ListView
-# from django.views.generic import CreateView, UpdateView
-from django.shortcuts import redirect
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 
 
-from .models import Post, Tag
-from .forms import PostForm
+from .models import Post, Tag, Like, Rate
+from .forms import PostForm, RatePostForm
 
 
 class PostListView(ListView):
@@ -36,7 +34,7 @@ class PostListView(ListView):
         context['tags'] = Tag.objects.filter(
             post__creation_datetime__date=today
         ).annotate(Count('post')).order_by('-post__count')
-
+        context['form'] = RatePostForm()
         return context
 
 
@@ -62,8 +60,8 @@ def post_new(request):
     return render(request, 'share.html', {'form': form})
 
 
-def delete_post(request, id):
-    post = get_object_or_404(Post, id=id)
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
     if request.user == post.created_by:
         if request.method == 'POST':
@@ -80,8 +78,8 @@ def delete_post(request, id):
         return redirect("users:login")
 
 
-def update_post(request, id):
-    post = get_object_or_404(Post, id=id)
+def update_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
     if request.user == post.created_by:
         if request.method == 'POST':
@@ -97,6 +95,32 @@ def update_post(request, id):
     else:
         messages.error(request, 'You are not the owner of this post, please log in.')
         return redirect("users:login")
+
+
+@login_required()
+def like_post(request, post_id):
+    like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
+
+    if not created:
+        like.delete()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required()
+def rate_post(request, post_id):
+
+    if request.method == 'POST':
+        form = RatePostForm(request.POST)
+
+    # if not form.is_valid():
+        # do something
+
+        rate, _ = Rate.objects.get_or_create(user=request.user, post_id=post_id)
+        rate.value = form.data['value']
+        rate.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 """

@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_tags %}
 
 {% block content %}
   <div class="container">
@@ -20,9 +22,16 @@
             <a href="{% url "posts:list" %}?tag={{tag}}">#{{ tag }}</a>
           {% endfor %}
           <br><br>
+          {% is_liked post user as is_liked %}
+          <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary" {% if is_liked %} style="background-color:green"{% endif %}>Like ({{ post.like_count }})</button></a>
+          <form method="POST" action="{% url "posts:rate_post" post.id %}" novalidate><br>
+            {% csrf_token %}
+            {{ form.value }} 
+          <button type="submit" class="btn btn-primary">Rate ({{ post.average_rate|floatformat:2 }})</button>
+          </form>
           {% if post.created_by == user %}
-          <a style="color: white;" href="{% url "posts:update_post" post.id %}"><button class="btn btn-primary">Update</button></a>
-          <a style="color: white;" href="{% url "posts:delete_post" post.id %}"><button class="btn btn-primary">Delete</button></a></br>
+          <a style="color: white;" href="{% url "posts:update_post" post.id %}"><button class="btn btn-primary float-right">Update</button></a>
+          <a style="color: white;" href="{% url "posts:delete_post" post.id %}"><button class="btn btn-primary float-right">Delete</button></a></br>
           {% endif %}
         </div>
         <small class="card-footer text-muted text-right p-2">{{ post.creation_datetime|date:"H:i - d.m.Y" }}</small>
@@ -34,7 +43,7 @@
     <center>
     <span class="step-links">
       {% if page_obj.has_previous %}          
-          <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      <a href={% relative_url page_obj.previous_page_number 'page' request.GET.urlencode %}>Previous</a>
       {% endif %}
 
       <span class="current">
@@ -42,10 +51,10 @@
       </span>
 
       {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}">Next</a>
+      <a href={% relative_url page_obj.next_page_number 'page' request.GET.urlencode %}>Next</a>
       {% endif %}
-    </span></center>
+    </span>
+    </center>
   </div>
   <br>
-
 {% endblock content %}

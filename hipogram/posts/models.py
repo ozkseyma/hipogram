@@ -41,4 +41,4 @@ class Rate(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['post', 'user'], name='unique_rate')
-                      ]
+        ]

@@ -97,6 +97,7 @@ def update_post(request, post_id):
         return redirect("users:login")
 
 
+@login_required()
 def like_post(request, post_id):
     like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
 
@@ -106,6 +107,7 @@ def like_post(request, post_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+@login_required()
 def rate_post(request, post_id):
 
     if request.method == 'POST':

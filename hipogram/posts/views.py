@@ -1,14 +1,14 @@
-from django.views.generic import ListView
-from django.shortcuts import redirect, render, get_object_or_404
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+# from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
 from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
 
 
 from .models import Post, Tag, Like, Rate
-from .forms import PostForm, RatePostForm
+from .forms import RatePostForm
 
 
 class PostListView(ListView):
@@ -38,63 +38,37 @@ class PostListView(ListView):
         return context
 
 
-"""
-class ShareView(CreateView):
+class PostCreateView(CreateView):
     model = Post
-    fields = ['image', 'text', 'created_by', 'tags', 'creation_datetime']
+    fields = ['image', 'text', 'tags']
     template_name = "share.html"
-    form = 'PostForm'
-"""
+    success_url = reverse_lazy("posts:list")
+    pk_url_kwarg = 'post_id'
 
-
-@login_required()
-def post_new(request):
-    if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
+    # override this method to determine the creator of the post
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
         if form.is_valid():
             form.instance.created_by = request.user
-            form.save()
-            return redirect("posts:list")
-    else:
-        form = PostForm()
-    return render(request, 'share.html', {'form': form})
-
-
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-
-    if request.user == post.created_by:
-        if request.method == 'POST':
-            form = PostForm(request.POST, instance=post)
-            post.delete()
-            messages.success(request, 'You have successfully deleted the post')
-            return redirect("posts:list")
+            return self.form_valid(form)
         else:
-            form = PostForm(instance=post)
-
-        return render(request, "delete.html", {'form': form})
-    else:
-        messages.error(request, 'You are not the owner of this post, please log in.')
-        return redirect("users:login")
+            return self.form_invalid(form)
 
 
-def update_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = "delete.html"
+    success_url = reverse_lazy("posts:list")
+    pk_url_kwarg = 'post_id'
 
-    if request.user == post.created_by:
-        if request.method == 'POST':
-            form = PostForm(request.POST, instance=post)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'You have successfully updated the post')
-                return redirect("posts:list")
-        else:
-            form = PostForm(instance=post)
 
-        return render(request, "update.html", {'form': form, 'post': post})
-    else:
-        messages.error(request, 'You are not the owner of this post, please log in.')
-        return redirect("users:login")
+class PostUpdateView(UpdateView):
+    model = Post
+    fields = ['text', 'tags']
+    context_object_name = "post"
+    template_name = "update.html"
+    success_url = reverse_lazy("posts:list")
+    pk_url_kwarg = 'post_id'
 
 
 @login_required()
@@ -121,14 +95,3 @@ def rate_post(request, post_id):
         rate.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-"""
-#option 2 to update a post
-class update_post(UpdateView):
-    model = Post
-    fields = ['text', 'tags']
-    template_name = 'update.html'
-    form = 'PostForm'
-    success_url = "list"
-"""

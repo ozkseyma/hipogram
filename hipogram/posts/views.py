@@ -20,9 +20,9 @@ class PostListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if username := self.request.GET.get('username'):
+        if username := self.request.GET.get("username"):
             queryset = queryset.filter(created_by__username=username)
-        if tag := self.request.GET.get('tag'):
+        if tag := self.request.GET.get("tag"):
             queryset = queryset.filter(tags__name=tag)
 
         return queryset
@@ -31,19 +31,19 @@ class PostListView(ListView):
         context = super().get_context_data()
         today = timezone.now().date()
 
-        context['tags'] = Tag.objects.filter(
+        context["tags"] = Tag.objects.filter(
             post__creation_datetime__date=today
-        ).annotate(Count('post')).order_by('-post__count')
-        context['form'] = RatePostForm()
+        ).annotate(Count("post")).order_by("-post__count")
+        context["form"] = RatePostForm()
         return context
 
 
 class PostCreateView(CreateView):
     model = Post
-    fields = ['image', 'text', 'tags']
+    fields = ["image", "text", "tags"]
     template_name = "share.html"
     success_url = reverse_lazy("posts:list")
-    pk_url_kwarg = 'post_id'
+    pk_url_kwarg = "post_id"
 
     # determine the creator of the post
     def post(self, request, *args, **kwargs):
@@ -59,16 +59,16 @@ class PostDeleteView(DeleteView):
     model = Post
     template_name = "delete.html"
     success_url = reverse_lazy("posts:list")
-    pk_url_kwarg = 'post_id'
+    pk_url_kwarg = "post_id"
 
 
 class PostUpdateView(UpdateView):
     model = Post
-    fields = ['text', 'tags']
+    fields = ["text", "tags"]
     context_object_name = "post"
     template_name = "update.html"
     success_url = reverse_lazy("posts:list")
-    pk_url_kwarg = 'post_id'
+    pk_url_kwarg = "post_id"
 
 
 class LikeView(LoginRequiredMixin, View):
@@ -80,18 +80,18 @@ class LikeView(LoginRequiredMixin, View):
         if not created:
             like.delete()
 
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 class RateView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
 
-        if request.method == 'POST':
+        if request.method == "POST":
             post_id = request.POST.get("post_id")
             form = RatePostForm(request.POST)
             rate, _ = Rate.objects.get_or_create(user=request.user, post_id=post_id)
-            rate.value = form.data['value']
+            rate.value = form.data["value"]
             rate.save()
 
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))

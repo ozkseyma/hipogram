@@ -25,7 +25,7 @@ class Post(models.Model):
 
     @property
     def average_rate(self):
-        return self.rates.aggregate(Avg('value'))['value__avg']
+        return self.rates.aggregate(Avg("value"))["value__avg"]
 
 
 class Like(models.Model):
@@ -40,5 +40,5 @@ class Rate(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['post', 'user'], name='unique_rate')
+            models.UniqueConstraint(fields=["post", "user"], name="unique_rate")
         ]

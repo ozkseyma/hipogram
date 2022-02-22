@@ -23,8 +23,8 @@
           {% endfor %}
           <br><br>
           {% is_liked post user as is_liked %}
-          <a style="color: white;" href="{% url "posts:like_post" post.id %}"><button class="btn btn-primary" {% if is_liked %} style="background-color:green"{% endif %}>Like ({{ post.like_count }})</button></a>
-          <form method="POST" action="{% url "posts:rate_post" post.id %}" novalidate><br>
+          <a style="color: white;" href="{% url "posts:like" post.id %}"><button class="btn btn-primary" {% if is_liked %} style="background-color:green"{% endif %}>Like ({{ post.like_count }})</button></a>
+          <form method="POST" action="{% url "posts:rate" post.id %}" novalidate><br>
             {% csrf_token %}
             {{ form.value }} 
           <button type="submit" class="btn btn-primary">Rate ({{ post.average_rate|floatformat:2 }})</button>

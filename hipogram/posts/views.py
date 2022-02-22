@@ -1,5 +1,5 @@
-from django.views.generic import ListView, CreateView, DeleteView, UpdateView
-from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView, View
+from django.contrib.auth.mixins import LoginRequiredMixin
 # from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
@@ -45,7 +45,7 @@ class PostCreateView(CreateView):
     success_url = reverse_lazy("posts:list")
     pk_url_kwarg = 'post_id'
 
-    # override this method to determine the creator of the post
+    # determine the creator of the post
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -71,27 +71,27 @@ class PostUpdateView(UpdateView):
     pk_url_kwarg = 'post_id'
 
 
-@login_required()
-def like_post(request, post_id):
-    like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
+class LikeView(LoginRequiredMixin, View):
 
-    if not created:
-        like.delete()
+    def get(self, request, *args, **kwargs):
+        post_id = request.GET.get("post_id")
+        like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if not created:
+            like.delete()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-@login_required()
-def rate_post(request, post_id):
+class RateView(LoginRequiredMixin, View):
 
-    if request.method == 'POST':
-        form = RatePostForm(request.POST)
+    def get(self, request, *args, **kwargs):
 
-    # if not form.is_valid():
-        # do something
+        if request.method == 'POST':
+            post_id = request.POST.get("post_id")
+            form = RatePostForm(request.POST)
+            rate, _ = Rate.objects.get_or_create(user=request.user, post_id=post_id)
+            rate.value = form.data['value']
+            rate.save()
 
-        rate, _ = Rate.objects.get_or_create(user=request.user, post_id=post_id)
-        rate.value = form.data['value']
-        rate.save()
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

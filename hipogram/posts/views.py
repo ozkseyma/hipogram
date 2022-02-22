@@ -38,7 +38,7 @@ class PostListView(ListView):
         return context
 
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ["image", "text", "tags"]
     template_name = "share.html"

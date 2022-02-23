@@ -6,19 +6,9 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 
-
 from .models import Post, Tag, Like, Rate
 from .forms import RatePostForm
-
-
-class OwnerRequiredMixin(LoginRequiredMixin):
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        post = self.get_object()
-        if post.created_by != self.request.user:
-            return self.handle_no_permission()
-        return response
+from .mixins import OwnerRequiredMixin
 
 
 class PostListView(ListView):
@@ -76,13 +66,6 @@ class PostUpdateView(OwnerRequiredMixin, UpdateView):
     template_name = "update.html"
     success_url = reverse_lazy("posts:list")
     pk_url_kwarg = "post_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        post = self.get_object()
-        if post.created_by != self.request.user:
-            return self.handle_no_permission()
-        return response
 
 
 class LikeView(LoginRequiredMixin, View):

@@ -11,6 +11,16 @@ from .models import Post, Tag, Like, Rate
 from .forms import RatePostForm
 
 
+class OwnerRequiredMixin(LoginRequiredMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        post = self.get_object()
+        if post.created_by != self.request.user:
+            return self.handle_no_permission()
+        return response
+
+
 class PostListView(ListView):
     model = Post
     ordering = "-creation_datetime"
@@ -46,23 +56,20 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     pk_url_kwarg = "post_id"
 
     # determine the creator of the post
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            form.instance.created_by = request.user
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.instance.created_by = self.request.user
+        return form
 
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(OwnerRequiredMixin, DeleteView):
     model = Post
     template_name = "delete.html"
     success_url = reverse_lazy("posts:list")
     pk_url_kwarg = "post_id"
 
 
-class PostUpdateView(UpdateView):
+class PostUpdateView(OwnerRequiredMixin, UpdateView):
     model = Post
     fields = ["text", "tags"]
     context_object_name = "post"
@@ -70,12 +77,18 @@ class PostUpdateView(UpdateView):
     success_url = reverse_lazy("posts:list")
     pk_url_kwarg = "post_id"
 
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        post = self.get_object()
+        if post.created_by != self.request.user:
+            return self.handle_no_permission()
+        return response
+
 
 class LikeView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        post_id = request.GET.get("post_id")
-        like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
+        like, created = Like.objects.get_or_create(user=request.user, post_id=kwargs["post_id"])
 
         if not created:
             like.delete()
@@ -85,13 +98,11 @@ class LikeView(LoginRequiredMixin, View):
 
 class RateView(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
-        if request.method == "POST":
-            post_id = request.POST.get("post_id")
-            form = RatePostForm(request.POST)
-            rate, _ = Rate.objects.get_or_create(user=request.user, post_id=post_id)
-            rate.value = form.data["value"]
-            rate.save()
+        form = RatePostForm(request.POST)
+        rate, _ = Rate.objects.get_or_create(user=request.user, post_id=kwargs["post_id"])
+        rate.value = form.data["value"]
+        rate.save()
 
-            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))

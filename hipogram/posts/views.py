@@ -1,6 +1,5 @@
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView, View
-from django.contrib.auth.mixins import LoginRequiredMixin
-# from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count
 from django.utils import timezone
 from django.http import HttpResponseRedirect
@@ -8,7 +7,7 @@ from django.urls import reverse_lazy
 
 from .models import Post, Tag, Like, Rate
 from .forms import RatePostForm
-from .mixins import OwnerRequiredMixin
+from .mixins import OwnerRequiredMixin, LoginRequiredMixin
 
 
 class PostListView(ListView):
@@ -38,12 +37,13 @@ class PostListView(ListView):
         return context
 
 
-class PostCreateView(LoginRequiredMixin, CreateView):
+class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Post
     fields = ["image", "text", "tags"]
     template_name = "share.html"
     success_url = reverse_lazy("posts:list")
     pk_url_kwarg = "post_id"
+    success_message = "You created the post successfully!"
 
     # determine the creator of the post
     def get_form(self, *args, **kwargs):
@@ -52,20 +52,22 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return form
 
 
-class PostDeleteView(OwnerRequiredMixin, DeleteView):
+class PostDeleteView(OwnerRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Post
     template_name = "delete.html"
     success_url = reverse_lazy("posts:list")
     pk_url_kwarg = "post_id"
+    success_message = "You deleted the post successfully!"
 
 
-class PostUpdateView(OwnerRequiredMixin, UpdateView):
+class PostUpdateView(OwnerRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Post
     fields = ["text", "tags"]
     context_object_name = "post"
     template_name = "update.html"
     success_url = reverse_lazy("posts:list")
     pk_url_kwarg = "post_id"
+    success_message = "You updated the post successfully!"
 
 
 class LikeView(LoginRequiredMixin, View):

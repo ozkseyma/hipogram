@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.views import LoginView as DjangoLoginView, LogoutView as DjangoLogoutView
+from django.contrib.auth.views import LoginView, LogoutView
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -21,10 +21,10 @@ class SignUpView(SuccessMessageMixin, CreateView):
         return valid
 
 
-class LogInView(SuccessMessageMixin, DjangoLoginView):
+class LogInView(SuccessMessageMixin, LoginView):
     success_message = "You are successfully logged in!"
     template_name = "login.html"
 
 
-class LogOutView(SuccessMessageMixin, DjangoLogoutView):
+class LogOutView(SuccessMessageMixin, LogoutView):
     success_message = "You are successfully logged out!"

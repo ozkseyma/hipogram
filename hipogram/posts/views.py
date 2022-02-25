@@ -1,14 +1,13 @@
-from django.views.generic import ListView
-from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView, View
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count
 from django.utils import timezone
 from django.http import HttpResponseRedirect
-
+from django.urls import reverse_lazy
 
 from .models import Post, Tag, Like, Rate
-from .forms import PostForm, RatePostForm
+from .forms import RatePostForm
+from .mixins import OwnerRequiredMixin, LoginRequiredMixin
 
 
 class PostListView(ListView):
@@ -20,9 +19,9 @@ class PostListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if username := self.request.GET.get('username'):
+        if username := self.request.GET.get("username"):
             queryset = queryset.filter(created_by__username=username)
-        if tag := self.request.GET.get('tag'):
+        if tag := self.request.GET.get("tag"):
             queryset = queryset.filter(tags__name=tag)
 
         return queryset
@@ -31,104 +30,64 @@ class PostListView(ListView):
         context = super().get_context_data()
         today = timezone.now().date()
 
-        context['tags'] = Tag.objects.filter(
+        context["tags"] = Tag.objects.filter(
             post__creation_datetime__date=today
-        ).annotate(Count('post')).order_by('-post__count')
-        context['form'] = RatePostForm()
+        ).annotate(Count("post")).order_by("-post__count")
+        context["form"] = RatePostForm()
         return context
 
 
-"""
-class ShareView(CreateView):
+class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Post
-    fields = ['image', 'text', 'created_by', 'tags', 'creation_datetime']
+    fields = ["image", "text", "tags"]
     template_name = "share.html"
-    form = 'PostForm'
-"""
+    success_url = reverse_lazy("posts:list")
+    pk_url_kwarg = "post_id"
+    success_message = "You created the post successfully!"
+
+    # determine the creator of the post
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.instance.created_by = self.request.user
+        return form
 
 
-@login_required()
-def post_new(request):
-    if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.instance.created_by = request.user
-            form.save()
-            return redirect("posts:list")
-    else:
-        form = PostForm()
-    return render(request, 'share.html', {'form': form})
+class PostDeleteView(OwnerRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = Post
+    template_name = "delete.html"
+    success_url = reverse_lazy("posts:list")
+    pk_url_kwarg = "post_id"
+    success_message = "You deleted the post successfully!"
 
 
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-
-    if request.user == post.created_by:
-        if request.method == 'POST':
-            form = PostForm(request.POST, instance=post)
-            post.delete()
-            messages.success(request, 'You have successfully deleted the post')
-            return redirect("posts:list")
-        else:
-            form = PostForm(instance=post)
-
-        return render(request, "delete.html", {'form': form})
-    else:
-        messages.error(request, 'You are not the owner of this post, please log in.')
-        return redirect("users:login")
+class PostUpdateView(OwnerRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Post
+    fields = ["text", "tags"]
+    context_object_name = "post"
+    template_name = "update.html"
+    success_url = reverse_lazy("posts:list")
+    pk_url_kwarg = "post_id"
+    success_message = "You updated the post successfully!"
 
 
-def update_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+class LikeView(LoginRequiredMixin, View):
 
-    if request.user == post.created_by:
-        if request.method == 'POST':
-            form = PostForm(request.POST, instance=post)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'You have successfully updated the post')
-                return redirect("posts:list")
-        else:
-            form = PostForm(instance=post)
+    def get(self, request, *args, **kwargs):
+        like, created = Like.objects.get_or_create(user=request.user, post_id=kwargs["post_id"])
 
-        return render(request, "update.html", {'form': form, 'post': post})
-    else:
-        messages.error(request, 'You are not the owner of this post, please log in.')
-        return redirect("users:login")
+        if not created:
+            like.delete()
+
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-@login_required()
-def like_post(request, post_id):
-    like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
+class RateView(LoginRequiredMixin, View):
 
-    if not created:
-        like.delete()
+    def post(self, request, *args, **kwargs):
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-@login_required()
-def rate_post(request, post_id):
-
-    if request.method == 'POST':
         form = RatePostForm(request.POST)
-
-    # if not form.is_valid():
-        # do something
-
-        rate, _ = Rate.objects.get_or_create(user=request.user, post_id=post_id)
-        rate.value = form.data['value']
+        rate, _ = Rate.objects.get_or_create(user=request.user, post_id=kwargs["post_id"])
+        rate.value = form.data["value"]
         rate.save()
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-"""
-#option 2 to update a post
-class update_post(UpdateView):
-    model = Post
-    fields = ['text', 'tags']
-    template_name = 'update.html'
-    form = 'PostForm'
-    success_url = "list"
-"""
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))

@@ -7,11 +7,11 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['image', 'text', 'tags', ]
+        fields = ["image", "text", "tags", ]
 
 
 class RatePostForm(forms.ModelForm):
 
     class Meta:
         model = Rate
-        fields = ['value']
+        fields = ["value"]

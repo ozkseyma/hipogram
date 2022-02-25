@@ -3,15 +3,28 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import LoginView, LogoutView
 
 
-class SignUpView(CreateView):
+class SignUpView(SuccessMessageMixin, CreateView):
     model = User
     form_class = UserCreationForm
     template_name = "signup.html"
     success_url = reverse_lazy("posts:list")
+    success_message = "You are succesfully signed up!"
 
     def form_valid(self, form):
         valid = super().form_valid(form)
         login(self.request, self.object)
+
         return valid
+
+
+class LogInView(SuccessMessageMixin, LoginView):
+    success_message = "You are successfully logged in!"
+    template_name = "login.html"
+
+
+class LogOutView(SuccessMessageMixin, LogoutView):
+    success_message = "You are successfully logged out!"

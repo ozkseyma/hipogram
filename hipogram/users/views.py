@@ -2,6 +2,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
+from django.contrib import messages
 from django.views.generic import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import LoginView, LogoutView
@@ -26,5 +27,8 @@ class LogInView(SuccessMessageMixin, LoginView):
     template_name = "login.html"
 
 
-class LogOutView(SuccessMessageMixin, LogoutView):
-    success_message = "You are successfully logged out!"
+class LogOutView(LogoutView):
+
+    def dispatch(self, request, *args, **kwargs):
+        messages.add_message(request, messages.INFO, 'You are successfully logged out.')
+        return super().dispatch(request, *args, **kwargs)

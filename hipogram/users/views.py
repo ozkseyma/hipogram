@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login, password_validation
+from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
@@ -45,10 +45,19 @@ class EditProfileView(SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy("posts:list")
     success_message = "You have successfully edited your profile!"
 
-    def form_valid(self, form):
-        password_validation.validate_password(form.data["password"], self.request.user)
-        self.request.user.set_password(form.data["password"])
-        self.request.user.username = form.data["username"]
-        self.request.user.save()
+    def get_form_kwargs(self):
+        return {
+            "user": self.request.user,
+            **super().get_form_kwargs()
+        }
 
+    def form_valid(self, form):
+        if form.data["password"]:
+            self.request.user.set_password(form.data["password"])
+
+        if form.data["username"]:
+            self.request.user.username = form.data["username"]
+            self.request.user.save()
+
+        login(self.request, self.request.user)
         return redirect("posts:list")

@@ -4,12 +4,14 @@
 {% block title %}Edit Profile{% endblock %}
 
 {% block content %}
-    <form method="POST" novalidate>
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
-    </form>
-    <a href="{% url "posts:list" %}">
-        <button type="submit" style="background-color: gray;" class="save btn btn-secondary">Cancel</button>
-    </a>
+<div class="container">
+  <form method="POST" novalidate>
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
+  </form>
+  <a href="{% url "posts:list" %}">
+    <button type="submit" style="background-color: gray;" class="save btn btn-secondary">Cancel</button>
+  </a>
+</div>
 {% endblock content %}

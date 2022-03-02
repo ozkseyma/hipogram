@@ -6,7 +6,7 @@
 {% block content %}
     <form method="POST" novalidate>
         {% csrf_token %}
-        {{ form.username|as_crispy_field }}
+        {{ form|crispy }}
         <button type="submit" style="background-color: green;" class="save btn btn-secondary">Update</button>
     </form>
     <a href="{% url "posts:list" %}">

@@ -1,12 +1,14 @@
-# from calendar import c
-from django.contrib.auth import login
+from django.contrib import messages
+from django.contrib.auth import login, password_validation
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib import messages
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
+
+from .forms import EditUserForm
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -35,16 +37,18 @@ class LogOutView(LogoutView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
-    template_name = "change_password.html"
-    success_url = reverse_lazy("posts:list")
-    success_message = "You have successfully changed your password!"
-
-
 class EditProfileView(SuccessMessageMixin, UpdateView):
     model = User
-    fields = ["username"]
+    form_class = EditUserForm
     template_name = "edit.html"
     pk_url_kwarg = "user_id"
     success_url = reverse_lazy("posts:list")
     success_message = "You have successfully edited your profile!"
+
+    def form_valid(self, form):
+        password_validation.validate_password(form.data["password"], self.request.user)
+        self.request.user.set_password(form.data["password"])
+        self.request.user.username = form.data["username"]
+        self.request.user.save()
+
+        return redirect("posts:list")

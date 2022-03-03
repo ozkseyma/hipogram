@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Post, Tag, Like, Rate
 from django.contrib.auth.models import User
+from .mixins import ReadOnlyAdminMixin
 
 
 class LikeInline(admin.TabularInline):
@@ -24,16 +25,14 @@ class PostAdmin(admin.ModelAdmin):
         return list(post.tags.all())
 
 
-class LikeAdmin(admin.ModelAdmin):
+class LikeAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_filter = ("post", "user")
     list_display = ("post", "user")
-    readonly_fields = ("post", "user")
 
 
-class RateAdmin(admin.ModelAdmin):
+class RateAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_filter = ("post", "user")
     list_display = ("post", "user", "value")
-    readonly_fields = ("post", "user", "value")
 
 
 class UserAdmin(admin.ModelAdmin):

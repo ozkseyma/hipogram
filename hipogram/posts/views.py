@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 
+
 from .models import Post, Tag, Like, Rate
 from .forms import RatePostForm
 from .mixins import OwnerRequiredMixin, LoginRequiredMixin

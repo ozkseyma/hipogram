@@ -32,6 +32,9 @@ class Like(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="likes")
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.user.username
+
 
 class Rate(models.Model):
     value = models.PositiveSmallIntegerField(choices=[(i, i) for i in [0, 1, 2, 3, 4, 5]], default=0)
@@ -42,3 +45,6 @@ class Rate(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["post", "user"], name="unique_rate")
         ]
+
+    def __str__(self):
+        return self.user.username

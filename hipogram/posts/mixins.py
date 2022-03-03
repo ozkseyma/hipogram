@@ -21,15 +21,3 @@ class LoginRequiredMixin(DjangoLoginRequiredMixin):
     def handle_no_permission(self):
         messages.add_message(self.request, messages.ERROR, "You are not logged in!")
         return redirect("users:login")
-
-
-class ReadOnlyAdminMixin:
-
-    def has_add_permission(self, *args, **kwargs):
-        return False
-
-    def has_change_permission(self, *args, **kwargs):
-        return False
-
-    def has_delete_permission(self, *args, **kwargs):
-        return False

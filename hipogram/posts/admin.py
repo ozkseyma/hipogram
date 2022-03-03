@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Post, Tag, Like, Rate
 from django.contrib.auth.models import User
-from .mixins import ReadOnlyAdminMixin
+from hipogram.core.mixins import ReadOnlyAdminMixin
 
 
 class LikeInline(admin.TabularInline):

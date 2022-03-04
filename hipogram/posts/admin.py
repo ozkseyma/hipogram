@@ -7,11 +7,11 @@ admin.site.register(Tag)
 admin.site.unregister(User)
 
 
-class LikeInline(admin.TabularInline):
+class LikeInline(ReadOnlyAdminMixin, admin.TabularInline):
     model = Like
 
 
-class RateInline(admin.TabularInline):
+class RateInline(ReadOnlyAdminMixin, admin.TabularInline):
     model = Rate
 
 
@@ -42,6 +42,6 @@ class RateAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_display = ("username", "first_name", "email", "is_active", "is_staff")
     inlines = [PostInline]

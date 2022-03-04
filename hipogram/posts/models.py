@@ -33,7 +33,7 @@ class Like(models.Model):
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} liked {self.post.created_by}'s post"
 
 
 class Rate(models.Model):
@@ -47,4 +47,4 @@ class Rate(models.Model):
         ]
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user} rated {self.value} to {self.post.created_by}'s post"

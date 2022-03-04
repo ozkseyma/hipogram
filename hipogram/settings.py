@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     "hipogram.core",
     "hipogram.posts",
     "hipogram.users",
-
-    "taggit"
 ]
 
 MIDDLEWARE = [

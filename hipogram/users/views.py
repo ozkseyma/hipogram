@@ -66,7 +66,7 @@ class EditProfileView(SuccessMessageMixin, UpdateView):
 
 class MessageView(CreateView):
     model = Message
-    fields = ["text"]
+    fields = ["receiver", "text"]
     template_name = "message.html"
     pk_url_kwargs = "user_id"
     success_url = reverse_lazy("users:message")

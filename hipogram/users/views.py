@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
 from .forms import EditUserForm
+from .models import Message
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -61,3 +62,16 @@ class EditProfileView(SuccessMessageMixin, UpdateView):
 
         login(self.request, self.request.user)
         return redirect("posts:list")
+
+
+class MessageView(CreateView):
+    model = Message
+    fields = ["text"]
+    template_name = "message.html"
+    pk_url_kwargs = "user_id"
+    success_url = reverse_lazy("users:message")
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.instance.sender = self.request.user
+        return form

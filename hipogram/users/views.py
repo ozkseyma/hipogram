@@ -6,7 +6,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
+
 
 from .forms import EditUserForm
 from .models import Message
@@ -64,14 +65,26 @@ class EditProfileView(SuccessMessageMixin, UpdateView):
         return redirect("posts:list")
 
 
-class MessageView(CreateView):
+class MessagesView(CreateView):
     model = Message
     fields = ["receiver", "text"]
-    template_name = "message.html"
+    template_name = "messages.html"
     pk_url_kwargs = "user_id"
     success_url = reverse_lazy("users:message")
 
-    def get_form(self, *args, **kwargs):
-        form = super().get_form(*args, **kwargs)
-        form.instance.sender = self.request.user
-        return form
+    def get_context_data(self):
+        context = super().get_context_data()
+        context["message_history"] = Message.objects.filter(
+            sender__id=self.kwargs["user_id"],
+        )
+        return context
+
+
+class ListMessagesView(ListView):
+    model = Message
+    context_object_name = "messages"
+    ordering = "-creation_datetime"
+    template_name = "list_messages.html"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(sender__id=self.kwargs["user_id"])

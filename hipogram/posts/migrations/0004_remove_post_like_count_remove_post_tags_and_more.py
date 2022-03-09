@@ -17,10 +17,6 @@ class Migration(migrations.Migration):
             model_name='post',
             name='like_count',
         ),
-        migrations.RemoveField(
-            model_name='post',
-            name='tags',
-        ),
         migrations.AlterField(
             model_name='post',
             name='created_by',

@@ -76,7 +76,6 @@ class MessagesView(CreateView):
     # determine the sender & the receiver of the message
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
-        breakpoint()
         form.instance.sender = self.request.user
         form.instance.receiver_id = self.kwargs["receiver_id"]
         return form
@@ -97,13 +96,13 @@ class MessagesView(CreateView):
 
 class ListMessagesView(ListView):
     model = Message
-    context_object_name = "messages"
+    context_object_name = "message_list"
     ordering = "-creation_datetime"
     template_name = "list_messages.html"
 
     def get_queryset(self):
         return super().get_queryset().filter(
             sender=self.request.user
-        ).values("receiver__username").annotate(
-                Count("receiver")
-            ).order_by("receiver__count")
+        ).values("receiver__username", "receiver__id").annotate(
+            Count("receiver")
+        ).order_by("receiver__count")

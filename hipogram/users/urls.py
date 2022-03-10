@@ -9,6 +9,6 @@ urlpatterns = [
     path("login/", LogInView.as_view(), name="login"),
     path("logout/", LogOutView.as_view(), name="logout"),
     path("users/edit-profile/<int:user_id>", EditProfileView.as_view(), name="edit"),
-    path("messages/<int:user_id>", ListMessagesView.as_view(), name="messages_list"),
-    path("create-message/<int:user_id>", MessagesView.as_view(), name="message"),
+    path("messages/", ListMessagesView.as_view(), name="messages_list"),
+    path("message/<int:receiver_id>", MessagesView.as_view(), name="message"),
 ]

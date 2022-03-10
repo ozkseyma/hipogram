@@ -7,6 +7,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, ListView
+from django.db.models import Count
 
 
 from .forms import EditUserForm
@@ -67,15 +68,29 @@ class EditProfileView(SuccessMessageMixin, UpdateView):
 
 class MessagesView(CreateView):
     model = Message
-    fields = ["receiver", "text"]
+    fields = ["text"]
     template_name = "messages.html"
-    pk_url_kwargs = "user_id"
-    success_url = reverse_lazy("users:message")
+    pk_url_kwargs = "receiver_id"
+    success_url = reverse_lazy("users:messages_list")
 
+    # determine the sender & the receiver of the message
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        breakpoint()
+        form.instance.sender = self.request.user
+        form.instance.receiver_id = self.kwargs["receiver_id"]
+        return form
+
+    # show message history of the two users
     def get_context_data(self):
         context = super().get_context_data()
-        context["message_history"] = Message.objects.filter(
-            sender__id=self.kwargs["user_id"],
+        context["q1"] = Message.objects.filter(
+            sender=self.request.user,
+            receiver_id=self.kwargs["receiver_id"]
+        )
+        context["q2"] = Message.objects.filter(
+            sender_id=self.kwargs["receiver_id"],
+            receiver=self.request.user
         )
         return context
 
@@ -87,4 +102,8 @@ class ListMessagesView(ListView):
     template_name = "list_messages.html"
 
     def get_queryset(self):
-        return super().get_queryset().filter(sender__id=self.kwargs["user_id"])
+        return super().get_queryset().filter(
+            sender=self.request.user
+        ).values("receiver__username").annotate(
+                Count("receiver")
+            ).order_by("receiver__count")

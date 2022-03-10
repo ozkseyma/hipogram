@@ -4,9 +4,15 @@
 {% block content %}
 
 <div class="container">
-{% for message in message_history %}
-<li>{{ message }}</li>
-{% endfor %}
+    <ul class="list-group">
+        {% for message in q1 %}
+            <p class="list list-group-item-primary" style="align-self: flex-start;"> {{ message.text }} </p><br>
+        {% endfor %}
+
+        {% for message in q2 %}
+            <p class="list list-group-item-danger" style="align-self: flex-end;">{{ message.text }} </p><br>
+        {% endfor %}
+    </ul>
     <form method="POST" novalidate>
         {% csrf_token %}
         {{ form|crispy }}

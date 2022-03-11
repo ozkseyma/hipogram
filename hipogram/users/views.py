@@ -8,6 +8,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, ListView
 from django.db.models import Count
+from itertools import chain
+from operator import attrgetter
 
 
 from .forms import EditUserForm
@@ -83,14 +85,15 @@ class MessagesView(CreateView):
     # show message history of the two users
     def get_context_data(self):
         context = super().get_context_data()
-        context["q1"] = Message.objects.filter(
+        q1 = Message.objects.filter(
             sender=self.request.user,
             receiver_id=self.kwargs["receiver_id"]
         )
-        context["q2"] = Message.objects.filter(
+        q2 = Message.objects.filter(
             sender_id=self.kwargs["receiver_id"],
             receiver=self.request.user
         )
+        context["qs"] = sorted(chain(q1, q2), key=attrgetter("creation_datetime"))
         return context
 
 

@@ -10,5 +10,5 @@ urlpatterns = [
     path("logout/", LogOutView.as_view(), name="logout"),
     path("users/edit-profile/<int:user_id>", EditProfileView.as_view(), name="edit"),
     path("messages/", ListMessagesView.as_view(), name="messages_list"),
-    path("message/<int:receiver_id>", MessagesView.as_view(), name="message"),
+    path("messages/<int:receiver_id>", MessagesView.as_view(), name="message"),
 ]

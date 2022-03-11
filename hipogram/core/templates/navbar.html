@@ -20,7 +20,7 @@
             {{ user.username }}
           </a>
           <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="{% url "users:messages_list" %}">Messages</a>
+            <a class="dropdown-item" href="{% url "users:messages_list" %}">Messages ({{ user.message_count }})</a>
             <a class="dropdown-item" href="{% url "users:edit" user.id %}">Edit Profile</a>
             <a class="dropdown-item" href="{% url "users:logout" %}">Log out</a>
           </div>

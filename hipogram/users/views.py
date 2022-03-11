@@ -4,13 +4,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, ListView
-from django.db.models import Count
-from itertools import chain
-from operator import attrgetter
-
+from django.views.generic import CreateView, ListView, UpdateView
 
 from .forms import EditUserForm
 from .models import Message
@@ -85,15 +82,15 @@ class MessagesView(CreateView):
     # show message history of the two users
     def get_context_data(self):
         context = super().get_context_data()
-        q1 = Message.objects.filter(
+        qs1 = Message.objects.filter(
             sender=self.request.user,
             receiver_id=self.kwargs["receiver_id"]
         )
-        q2 = Message.objects.filter(
+        qs2 = Message.objects.filter(
             sender_id=self.kwargs["receiver_id"],
             receiver=self.request.user
         )
-        context["qs"] = sorted(chain(q1, q2), key=attrgetter("creation_datetime"))
+        context["qs"] = (qs1 | qs2).order_by("creation_datetime")
         return context
 
 

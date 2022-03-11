@@ -1,16 +1,12 @@
+from django.contrib.auth.models import User as DjangoUser
 from django.db import models
-from django.contrib.auth.models import User
-from itertools import chain
 
 
-class UserMethods(User):
+class User(DjangoUser):
 
     @property
     def message_count(self):
-        return chain(self.received_messages, self.sent_messages).count()
-
-    class Meta:
-        proxy = True
+        return self.received_messages.count() + self.sent_messages.count()
 
 
 class Message(models.Model):

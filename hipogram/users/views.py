@@ -1,20 +1,21 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
+# from hipogram.posts.mixins import LoginRequiredMixin
+from django.contrib.auth import get_user_model
 
 from .forms import EditUserForm
 from .models import Message
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
-    model = User
+    model = get_user_model()
     form_class = UserCreationForm
     template_name = "signup.html"
     success_url = reverse_lazy("posts:list")
@@ -40,7 +41,7 @@ class LogOutView(LogoutView):
 
 
 class EditProfileView(SuccessMessageMixin, UpdateView):
-    model = User
+    model = get_user_model()
     form_class = EditUserForm
     template_name = "edit.html"
     pk_url_kwarg = "user_id"

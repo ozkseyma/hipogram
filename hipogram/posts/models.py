@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Avg
+from django.contrib.auth import get_user_model
 
 
 class Tag(models.Model):
@@ -12,7 +13,7 @@ class Tag(models.Model):
 class Post(models.Model):
     image = models.ImageField()
     text = models.TextField()
-    created_by = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     creation_datetime = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag, help_text="Ctrl + click to select multiple", blank=True)
 
@@ -30,7 +31,7 @@ class Post(models.Model):
 
 class Like(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="likes")
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user.username} liked {self.post.created_by}'s post"
@@ -39,7 +40,7 @@ class Like(models.Model):
 class Rate(models.Model):
     value = models.PositiveSmallIntegerField(choices=[(i, i) for i in [0, 1, 2, 3, 4, 5]], default=0)
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="rates")
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     class Meta:
         constraints = [

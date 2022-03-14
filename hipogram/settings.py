@@ -150,4 +150,6 @@ SHARE_REDIRECT_URL = "posts:share"
 # Crispy Forms
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+AUTH_USER_MODEL = "users.User"

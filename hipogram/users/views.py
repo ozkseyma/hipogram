@@ -1,18 +1,21 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, ListView, UpdateView
+# from hipogram.posts.mixins import LoginRequiredMixin
+from django.contrib.auth import get_user_model
 
 from .forms import EditUserForm
+from .models import Message
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
-    model = User
+    model = get_user_model()
     form_class = UserCreationForm
     template_name = "signup.html"
     success_url = reverse_lazy("posts:list")
@@ -38,7 +41,7 @@ class LogOutView(LogoutView):
 
 
 class EditProfileView(SuccessMessageMixin, UpdateView):
-    model = User
+    model = get_user_model()
     form_class = EditUserForm
     template_name = "edit.html"
     pk_url_kwarg = "user_id"
@@ -61,3 +64,46 @@ class EditProfileView(SuccessMessageMixin, UpdateView):
 
         login(self.request, self.request.user)
         return redirect("posts:list")
+
+
+class MessagesView(CreateView):
+    model = Message
+    fields = ["text"]
+    template_name = "messages.html"
+    pk_url_kwargs = "receiver_id"
+    success_url = reverse_lazy("users:messages_list")
+
+    # determine the sender & the receiver of the message
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.instance.sender = self.request.user
+        form.instance.receiver_id = self.kwargs["receiver_id"]
+        return form
+
+    # show message history of the two users
+    def get_context_data(self):
+        context = super().get_context_data()
+        qs1 = Message.objects.filter(
+            sender=self.request.user,
+            receiver_id=self.kwargs["receiver_id"]
+        )
+        qs2 = Message.objects.filter(
+            sender_id=self.kwargs["receiver_id"],
+            receiver=self.request.user
+        )
+        context["qs"] = (qs1 | qs2).order_by("creation_datetime")
+        return context
+
+
+class ListMessagesView(ListView):
+    model = Message
+    context_object_name = "message_list"
+    ordering = "-creation_datetime"
+    template_name = "list_messages.html"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            sender=self.request.user
+        ).values("receiver__username", "receiver__id").annotate(
+            Count("receiver")
+        ).order_by("receiver__count")
